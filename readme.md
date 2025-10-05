@@ -1,96 +1,163 @@
-Fantastic! You've generated all the necessary outputs. The coding and analysis portion of the hackathon is officially complete. Your `final_output_df` is ready, and your analysis of STL provides a powerful story.
+# United Airlines - Flight Difficulty Score
 
-You are in the final stage. The only thing left is to package your incredible work into a compelling presentation and prepare your submission files.
+## 📝 Introduction & Objective
 
----
+Frontline teams at United Airlines are responsible for ensuring every flight departs on time. However, not all flights are equally complex. This project addresses the need for a systematic, data-driven approach to identify high-difficulty flights before they become operational challenges.
 
-### Final Step: Build Your Presentation & Submit 🏆
-
-Now it's time to be a data storyteller and business strategist. You will use the outputs you just generated to build a narrative for United Airlines.
-
-#### 1. Build Your Presentation (7-8 Slides)
-
-Here is a slide-by-slide guide to creating a high-impact presentation.
-
-- **Slide 1: Title Slide**
-
-  - Title: A Data-Driven Flight Difficulty Score to Enhance Operational Efficiency
-  - Your Name
-
-- **Slide 2: Executive Summary (The Elevator Pitch)**
-
-  - **The Problem:** Nearly 50% of flights from ORD depart late, driven by inconsistent, experience-based resource planning.
-  - **Our Solution:** We developed a daily Flight Difficulty Score that systematically ranks every flight by its operational complexity.
-  - **Key Finding:** The primary drivers of difficulty are extreme ground time pressure and high volumes of transfer baggage, particularly on short-haul routes like St. Louis (STL).
-  - **Top Recommendation:** Proactively allocate specialized ground crews and baggage handlers to the top 5% of 'Difficult' flights each day, starting with the STL route.
-
-- **Slide 3: Key Findings from the Data**
-
-  - Use your most powerful EDA numbers.
-  - **"Departure Delays are Widespread":** Show the "Average delay: 21.19 minutes" and "49.7% of flights depart late."
-  - **"Ground Time is a Critical Bottleneck":** Highlight that "621 flights were scheduled with less than the minimum required turnaround time," putting them at risk before the day even began.
-  - **"ORD is a Complex Transfer Hub":** Note the high average ratio of ~3 transfer bags for every checked bag.
-
-- **Slide 4: Our Solution: The Flight Difficulty Score**
-
-  - Briefly explain your model.
-  - **Features:** List the features you used (`ground_time_pressure`, `passenger_load_factor`, etc.).
-  - **Weighting:** Explain your logic. "We assigned the highest weight (30%) to **Ground Time Pressure** because our EDA revealed it was a significant and direct operational constraint. **Transfer Bag Ratio** received the next highest weight (20%) due to ORD's role as a major hub."
-
-- **Slide 5: Analysis Deep Dive: St. Louis (STL)**
-
-  - This is where you use your latest output!
-  - Show the "Top 10 Most Difficult Destinations" list, with STL at the top.
-  - Display the comparison table for STL.
-  - **The Story:** "Flights to St. Louis are **44% more delayed** than the airport average. Our analysis reveals two clear reasons why: they have **51% less ground time buffer** and handle **50% more transfer bags**."
-
-- **Slide 6: Actionable Recommendations**
-
-  - Turn your STL analysis into concrete actions.
-  - **Recommendation 1 (Address Ground Time):** "For the top 5 daily 'Difficult' flights to STL, we recommend pre-assigning an expanded ground crew to guarantee the aircraft is ready for boarding ahead of schedule, directly countering the -51% ground time pressure."
-  - **Recommendation 2 (Address Transfer Bags):** "For STL-bound flights, baggage handlers should prioritize sorting transfer bags. Since these flights handle 50% more transfers, this targeted approach will reduce mishandled bags and departure delays waiting on baggage."
-
-- **Slide 7: Conclusion & Business Impact**
-  - Summarize the value of your solution.
-  - **From Reactive to Proactive:** Your score allows teams to plan for difficulty _before_ it happens.
-  - **Data-Driven Decisions:** Replaces guesswork with a consistent, scalable system.
-  - **Expected Outcome:** Improved on-time performance, more efficient use of resources, and reduced employee stress.
+The goal is to design and implement a **Flight Difficulty Score** that quantifies the relative complexity of each flight departing from Chicago O’Hare (ORD). This score enables proactive planning and optimized resource allocation by identifying the primary operational drivers contributing to flight difficulty.
 
 ---
 
-### 2. Finalize Your Submission Package
+##  Methodology
 
-You're ready to submit. Just run through this final checklist.
+The analysis was conducted in a Jupyter Notebook using Python with the pandas, scikit-learn, and matplotlib libraries. The workflow was as follows:
 
-1.  **Presentation:** Save your slides as a PDF.
-2.  **CSV File:** You have already created `test_yourname.csv`. Make sure it's named correctly.
-3.  **Code:** Clean up your Python notebook. Add comments to explain your steps. Write a simple `README.md` file with instructions if needed.
-4.  **Zip Everything:** Combine the PDF, CSV, and code files into a single ZIP folder. Double-check the name and size limits.
+1.  **Data Loading & Cleaning:** Loaded five datasets (`Flight Level`, `PNR`, `Baggage`, etc.). Cleaned the data by converting data types, handling missing values, and critically, **removing 23 duplicate flight records** to ensure data integrity.
+2.  **Data Aggregation:** Transformed granular PNR, baggage, and special service request (SSR) data to a unique, flight-level view. This was achieved using a robust **merge-then-aggregate** strategy to correctly link records to a specific flight instance (flight number + scheduled departure time).
+3.  **Feature Engineering:** Created new, insightful features to quantify operational complexity, including:
+    * `departure_delay`: The primary outcome metric.
+    * `passenger_load_factor`: The percentage of seats filled.
+    * `ground_time_pressure`: The buffer between scheduled ground time and the minimum required turn time.
+    * `transfer_bag_ratio`: The proportion of transfer bags to total bags, measuring baggage handling complexity.
+4.  **Exploratory Data Analysis (EDA):** Investigated the relationships between these features and operational outcomes to identify the strongest drivers of difficulty.
+5.  **Score Development:** Built a weighted difficulty score by normalizing the selected features using `MinMaxScaler` and applying weights based on the EDA findings.
+6.  **Ranking & Classification:** Ranked flights daily by their difficulty score and classified them into three tiers: **Difficult, Medium, and Easy**.
 
-Congratulations on completing this challenging hackathon problem from start to finish!
-That's an excellent question. The process of deciding the weights is the most critical step in building a transparent and defensible scoring model. It's where you translate your analytical insights into a business tool.
+---
 
-The weights were not chosen randomly; they were decided based on the evidence you uncovered during your Exploratory Data Analysis (EDA). You assigned higher weights to the factors that your analysis proved had the strongest impact on operational difficulty and delays.
+## 📊 Exploratory Data Analysis (EDA)
 
-Here is a breakdown of the logic, which is also reflected in your readme.md presentation guide:
+This analysis answered key operational questions, revealing the underlying drivers of flight difficulty.
 
-The Rationale Behind the Weights
-Think of your weights as being distributed across three tiers of importance:
+#### 1. What is the average delay and what percentage of flights depart later than scheduled?
 
-1. Primary Drivers (Highest Weights)
-   ground_time_pressure: 0.30 (30%)
-   Reasoning: Your EDA revealed this was the most significant proactive indicator of difficulty. You found that hundreds of flights were scheduled with a time deficit before the day even began. This is a direct, physical constraint on the operation, making it the most important factor.
-   transfer_bag_ratio: 0.20 (20%)
-   Reasoning: Your analysis showed that ORD is a major transfer hub and that transfer bags are inherently more complex to handle than origin bags. A high proportion of these bags puts significant strain on baggage crews and is a major risk for delays, justifying its high weight.
-2. Secondary Drivers (Medium Weights)
-   passenger_load_factor: 0.15 (15%)
-   Reasoning: Your analysis showed that the correlation between load factor and delay was weak on its own. However, a full flight is still undeniably more complex than an empty one (more people to board, more carry-ons). It's a contributing factor, but not a primary driver, so it gets a moderate weight.
-   ssr_count: 0.15 (15%)
-   Reasoning: Your controlled analysis proved that a high number of Special Service Requests (SSRs) leads to greater delays, even after accounting for how full the flight is. This confirmed it as an independent driver of complexity related to passenger needs, earning it a solid medium weight.
-3. Supporting Drivers (Lowest Weights)
-   hot_transfer: 0.10 (10%)
-   Reasoning: This is a more specific version of the transfer bag issue. While important, it's a subset of the overall baggage complexity. It gets a distinct weight to flag these time-critical bags but is less impactful than the overall ratio.
-   child_count & lap_child_count: 0.05 + 0.05 = 0.10 (10% total)
-   Reasoning: These features are excellent proxies for the presence of young families who may require more time and assistance during boarding. They add valuable nuance to the score but are less impactful on a macro level than major constraints like ground time.
-   In summary, you told a story with your weights: "The biggest problems are time and bags. The next biggest problems are the needs of the people on board. Everything else adds a little extra complexity." This data-driven approach is what makes your model so effective.
-   "Our model identified St. Louis as the most consistently difficult destination. We investigated why, and found that these flights have 51% less ground time and 50% more transfer bags than average..."
+* **Average Departure Delay:** **21.19 minutes**
+* **Percentage of Late Flights:** **49.65%**
+* **Significance:** This establishes a baseline for the operational challenge at ORD. With nearly half of all flights departing late, any proactive measure to reduce the average delay of over 20 minutes can have a significant positive impact on the entire network, improving customer satisfaction and reducing downstream costs.
+
+#### 2. How many flights have scheduled ground time close to or below the minimum turn time?
+
+* A total of **621 flights** (7.7% of the total) had a scheduled ground time *below* the minimum required.
+* **Significance:** This is a critical finding. It means a significant portion of the schedule is operationally compromised from the start. These flights have no buffer for unforeseen issues, making them inherently high-risk and prime candidates for proactive monitoring. This validates `ground_time_pressure` as a key feature for the difficulty score.
+
+#### 3. What is the average ratio of transfer bags vs. checked bags across flights?
+
+* The average ratio of transfer bags to checked (origin) bags is **3.05**.
+* **Significance:** This highlights that baggage complexity at a hub like ORD is driven more by connection logistics than by the number of local passengers. A high ratio points to a flight that is a critical node in the baggage network, increasing the risk of mishandling or delays while waiting for connecting bags.
+
+#### 4. How do passenger loads compare, and do they correlate with delays?
+
+* There is a **weak negative correlation of -0.16** between `passenger_load_factor` and `departure_delay`.
+* **Significance:** This counter-intuitive insight proves that the simple assumption "fuller flights equal more delays" is incorrect. It suggests that the airline may already allocate more experienced crews or streamlined processes to its most profitable (fullest) flights. This confirms that passenger load alone is not a sufficient predictor of difficulty and must be considered alongside other factors.
+
+*<p align="center">Passenger Load Factor vs. Departure Delay</p>*
+![Passenger Load Factor vs. Departure Delay](./images/load_vs_delay.png)
+
+#### 5. Are high SSR flights also high-delay after controlling for passenger load?
+
+* **Yes, decisively.** At every level of passenger load (Medium, High, and Very High), flights with a greater number of Special Service Requests (SSRs) experience significantly higher average departure delays.
+* **Significance:** This is a powerful insight. It isolates `ssr_count` as an **independent driver of complexity**. It’s not just that full flights have more SSRs; even when comparing two equally full flights, the one with more special requests (e.g., wheelchairs, unaccompanied minors) is statistically more likely to be delayed. This provides a strong, data-backed justification for including `ssr_count` in the difficulty score.
+
+*<p align="center">Impact of SSRs on Delay, Controlled for Passenger Load</p>*
+![Impact of SSRs on Delay, Controlled for Passenger Load](./images/ssr_vs_delay.png)
+
+---
+
+## 🔢 Flight Difficulty Score Development
+
+The difficulty score is a weighted sum of normalized features identified as key drivers of complexity.
+
+#### Feature Selection and Weighting
+
+Features were scaled from 0 to 1. `ground_time_pressure` was inverted, so a smaller time buffer results in a higher score. Weights were assigned based on EDA findings.
+
+| Feature                   | Weight | Justification                                                      |
+| :------------------------ | :----: | :----------------------------------------------------------------- |
+| `ground_time_pressure`    |  30%   | The strongest indicator of pre-existing operational risk.          |
+| `transfer_bag_ratio`      |  20%   | High transfer volume creates significant baggage handling strain.  |
+| `ssr_count`               |  15%   | Proven to directly correlate with higher delays, independent of load. |
+| `passenger_load_factor`   |  15%   | Fuller flights increase general complexity and boarding time.      |
+| `hot_transfer`            |  10%   | Time-sensitive bags with tight connections add an extra pressure layer. |
+| `child_count`             |   5%   | More children can slow the boarding and deplaning process.         |
+| `lap_child_count`         |   5%   | Adds minor gate-side documentation and seating complexity.         |
+
+#### Outputs
+
+1.  **Ranking (`daily_difficulty_rank`):** Flights are ranked each day, with rank `1.0` being the most difficult.
+2.  **Classification (`difficulty_class`):** Flights are categorized as **Difficult** (top 30%), **Medium** (next 50%), or **Easy** (bottom 20%) based on their daily rank.
+
+---
+
+## 💡 Post-Analysis & Operational Insights
+
+#### Top 10 Most Difficult Destinations from ORD
+
+The analysis reveals that operational difficulty is concentrated on specific routes. Flights to **St. Louis (STL)** are consistently the most challenging.
+
+| Arrival Airport | Count of 'Difficult' Flights |
+| :-------------- | :---------------------------: |
+| STL             |              88               |
+| DTW             |              54               |
+| GRR             |              53               |
+| DSM             |              53               |
+| MSP             |              51               |
+| DAY             |              51               |
+| CLE             |              49               |
+| CID             |              49               |
+| OMA             |              48               |
+| SEA             |              45               |
+
+#### Common Drivers for Difficult Flights to St. Louis (STL)
+
+A deep dive into the STL route reveals two primary drivers compared to the airport-wide average:
+
+1.  **Ground Time Pressure:** Difficult flights to STL have **~51% less ground time buffer**. They are operationally constrained before the turnaround process even begins.
+2.  **Baggage Complexity:** These flights handle a **~50% higher ratio of transfer bags**, indicating intense pressure on the baggage handling system.
+
+---
+
+## 🚀 Actionable Recommendations
+
+Based on these findings, we propose a shift from a reactive to a proactive operational model with the following targeted actions:
+
+1.  **Create a "Proactive Operations Team" for High-Pressure Turnarounds.**
+    * **Action:** Each morning, use the Flight Difficulty Score to identify the top 5 flights with severe `ground_time_pressure`. Assign a dedicated team to these flights to ensure all pre-departure tasks (fueling, catering, cleaning) are completed ahead of schedule.
+    * **Justification:** This is a high-ROI, targeted use of resources that mitigates the #1 risk factor for delays.
+
+2.  **Implement a "Priority Transfer Bag" Protocol.**
+    * **Action:** For flights flagged as 'Difficult' due to a high `transfer_bag_ratio`, instruct baggage handlers to unload and transport bags for these flights first from connecting aircraft.
+    * **Justification:** This directly reduces the risk of holding a flight for late bags, a common cause of delays, and improves customer satisfaction by reducing mishandled baggage.
+
+3.  **Launch a Pilot Program Focused on the ORD-STL Route.**
+    * **Action:** Roll out the recommendations above as a one-month pilot program exclusively for flights to St. Louis. Track on-time performance and average delay metrics against the baseline established in this analysis.
+    * **Justification:** A successful pilot will provide a quantifiable business case to expand these data-driven strategies to other difficult routes across the network.
+
+---
+
+## ⚙️ How to Run
+
+1.  **Prerequisites:**
+    * Python 3.x
+    * Jupyter Notebook or JupyterLab
+    * Required libraries: `pandas`, `numpy`, `scikit-learn`, `matplotlib`, `seaborn` (`pip install pandas numpy scikit-learn matplotlib seaborn`)
+2.  **Data:**
+    * Place all five provided `.csv` files into a `data` folder located one level above the notebook directory (`../data/`).
+3.  **Execution:**
+    * Run all cells in the `notebook1.ipynb` notebook from top to bottom. The final output file will be generated in the root directory.
+
+---
+
+## 📁 Final Output
+
+The project generates a CSV file named `test_yourname1.csv` containing the flight details, the features used for the score, and the final difficulty metrics.
+
+**File Preview (`test_yourname1.csv`):**
+```csv
+flight_number,scheduled_departure_datetime_local,scheduled_arrival_station_code,ground_time_pressure,passenger_load_factor,transfer_bag_ratio,ssr_count,hot_transfer,child_count,lap_child_count,difficulty_score,daily_difficulty_rank,difficulty_class
+4792,2025-08-04 17:57:00+00:00,ROA,8.0,0.8552631578947368,0.47619047619047616,3.0,16,1,0,0.5412000551062089,297.0,Medium
+920,2025-08-03 18:05:00+00:00,LHR,90.0,1.0,0.2587412587412587,3.0,16,5,1,0.5318833075204489,387.0,Medium
+1776,2025-08-10 18:20:00+00:00,PHL,25.0,1.0,0.4470588235294118,0.0,1,5,0,0.5368115456254719,365.0,Medium
+5790,2025-08-06 18:20:00+00:00,CRW,194.0,1.0,0.7407407407407407,2.0,0,2,0,0.6010603886561186,99.0,Difficult
+1398,2025-08-05 18:20:00+00:00,ATL,24.0,0.8192771084337349,0.7285714285714285,2.0,0,3,0,0.572437346808794,233.0,Medium
+...
+```
