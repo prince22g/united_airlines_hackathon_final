@@ -1,6 +1,6 @@
 # United Airlines - Flight Difficulty Score
 
-## 📝 Introduction & Objective
+##  Introduction & Objective
 
 Frontline teams at United Airlines are responsible for ensuring every flight departs on time. However, not all flights are equally complex. This project addresses the need for a systematic, data-driven approach to identify high-difficulty flights before they become operational challenges.
 
@@ -25,7 +25,7 @@ The analysis was conducted in a Jupyter Notebook using Python with the pandas, s
 
 ---
 
-## 📊 Exploratory Data Analysis (EDA)
+##  Exploratory Data Analysis (EDA)
 
 This analysis answered key operational questions, revealing the underlying drivers of flight difficulty.
 
@@ -63,7 +63,7 @@ This analysis answered key operational questions, revealing the underlying drive
 
 ---
 
-## 🔢 Flight Difficulty Score Development
+##  Flight Difficulty Score Development
 
 The difficulty score is a weighted sum of normalized features identified as key drivers of complexity.
 
@@ -88,7 +88,7 @@ Features were scaled from 0 to 1. `ground_time_pressure` was inverted, so a smal
 
 ---
 
-## 💡 Post-Analysis & Operational Insights
+##  Post-Analysis & Operational Insights
 
 #### Top 10 Most Difficult Destinations from ORD
 
@@ -116,7 +116,7 @@ A deep dive into the STL route reveals two primary drivers compared to the airpo
 
 ---
 
-## 🚀 Actionable Recommendations
+##  Actionable Recommendations
 
 Based on these findings, we propose a shift from a reactive to a proactive operational model with the following targeted actions:
 
@@ -134,7 +134,11 @@ Based on these findings, we propose a shift from a reactive to a proactive opera
 
 ---
 
-## ⚙️ How to Run
+##  How to Run
+
+### 1: Main Analysis (Jupyter Notebook)
+
+This is the primary method to replicate the analysis and generate the final csv file.
 
 1.  **Prerequisites:**
     * Python 3.x
@@ -145,9 +149,25 @@ Based on these findings, we propose a shift from a reactive to a proactive opera
 3.  **Execution:**
     * Run all cells in the `notebook1.ipynb` notebook from top to bottom. The final output file will be generated in the root directory.
 
+### 2: Database Population (Optional Python Script)
+
+This script populates a PostgreSQL database with the source data and the final analysis results, allowing for further exploration using SQL.
+
+1.  **Database Prerequisites:**
+    * A running PostgreSQL server.
+    * A database created on the server (e.g., `flight_analysis`).
+    * Required Python library for PostgreSQL connection: `psycopg2-binary` (`pip install sqlalchemy psycopg2-binary`).
+2.  **Script Setup:**
+    * Save the provided database script as a Python file (e.g., `populate_db.py`).
+    * Update the database connection details at the top of the script ( `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`).
+    * Ensure the `test_yourname.csv` file generated from the notebook analysis is present in the `data` folder.
+3.  **Execution:**
+    * Run the script from your terminal: `python populate_db.py`.
+    * The script will connect to the database, create the necessary table schemas, and load the data from all CSV files into their respective tables.
+
 ---
 
-## 📁 Final Output
+##  Final Output
 
 The project generates a CSV file named `test_yourname1.csv` containing the flight details, the features used for the score, and the final difficulty metrics.
 
