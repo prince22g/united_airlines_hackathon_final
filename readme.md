@@ -51,7 +51,7 @@ This analysis answered key operational questions, revealing the underlying drive
 * **Significance:** This counter-intuitive insight proves that the simple assumption "fuller flights equal more delays" is incorrect. It suggests that the airline may already allocate more experienced crews or streamlined processes to its most profitable (fullest) flights. This confirms that passenger load alone is not a sufficient predictor of difficulty and must be considered alongside other factors.
 
 *<p align="center">Passenger Load Factor vs. Departure Delay</p>*
-![Passenger Load Factor vs. Departure Delay](./images/load_vs_delay.png)
+![Passenger Load Factor vs. Departure Delay](./docs/images/passenger%20load%20factor%20vs%20departure%20delay.png)
 
 #### 5. Are high SSR flights also high-delay after controlling for passenger load?
 
@@ -59,7 +59,7 @@ This analysis answered key operational questions, revealing the underlying drive
 * **Significance:** This is a powerful insight. It isolates `ssr_count` as an **independent driver of complexity**. It’s not just that full flights have more SSRs; even when comparing two equally full flights, the one with more special requests (e.g., wheelchairs, unaccompanied minors) is statistically more likely to be delayed. This provides a strong, data-backed justification for including `ssr_count` in the difficulty score.
 
 *<p align="center">Impact of SSRs on Delay, Controlled for Passenger Load</p>*
-![Impact of SSRs on Delay, Controlled for Passenger Load](./images/ssr_vs_delay.png)
+![Impact of SSRs on Delay, Controlled for Passenger Load](./docs/images/Impact%20of%20SSRs%20on%20Delay,%20Controlled%20for%20Passenger%20Load.png)
 
 ---
 
